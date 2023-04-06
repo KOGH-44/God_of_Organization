@@ -62,7 +62,7 @@ void display_items()
         printf("\t\t인벤토리가 비어 있습니다.\n");
         return;
     }
-    printf("\t\t---인벤토리에 있는 상품---\n");
+    printf("[인벤토리에 있는 상품]\n");
     while (temp != NULL)
     {
         printf("바코드: %lld, 상품명: %s, 분류: %s, 가격: %d, 제조사: %s, 재고량: %d, 유통기한: %s\n",
