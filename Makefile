@@ -4,5 +4,5 @@ app.out : main_revise.o cJSON.o
 main.o : main_revise.c
 	gcc -c -o main_revise.o main_revise.c
 
-linkedList.o : cJSON.h cJSON.c
+cJSON.o : cJSON.h cJSON.c
 	gcc -c -o cJSON.o cJSON.c
