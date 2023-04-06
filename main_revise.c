@@ -124,9 +124,15 @@ void load_inventory_from_file(const char *file_name)
     }
 
     // 2. 파일 전체를 버퍼에 읽어오기
+
+    //fseek(file, 0, SEEK_END)를 사용하여 파일 포인터를 파일의 끝으로 이동시키고, 
+    //long length = ftell(file)를 사용하여 현재 파일 포인터의 위치를 얻어 파일의 크기를 구합니다. 
+    //마지막으로, fseek(file, 0, SEEK_SET)를 사용하여 파일 포인터를 다시 파일의 시작 위치로 되돌립니다.
     fseek(file, 0, SEEK_END);
-    long length = ftell(file); // 파일 크기
+    long length = ftell(file);
     fseek(file, 0, SEEK_SET);
+
+
     char *buffer = (char *)malloc(length + 1); // 버퍼 할당
     if (buffer == NULL)
     {
@@ -134,6 +140,7 @@ void load_inventory_from_file(const char *file_name)
         fclose(file);
         return;
     }
+    
     fread(buffer, 1, length, file);
     buffer[length] = '\0';
     fclose(file);
