@@ -1,9 +1,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdbool.h>
+#include "cJSON.h"
 
 #define EXPIR 50
 #define S_SIZE 50
+#define FILE_NAME "productList.json"
 
 typedef struct Item
 {
@@ -109,8 +112,75 @@ void delete_item(long long 바코드)
     free(temp);
 }
 
-int main()
+// JSON 파일을 읽어서 인벤토리에 추가
+void load_inventory_from_file(const char *file_name)
 {
+    // 1. JSON 파일을 읽기 위해 열기
+    FILE *file = fopen(file_name, "rb");
+    if (file == NULL)
+    {
+        printf("Unable to open %s for reading.\n", file_name);
+        return;
+    }
+
+    // 2. 파일 전체를 버퍼에 읽어오기
+    fseek(file, 0, SEEK_END);
+    long length = ftell(file); // 파일 크기
+    fseek(file, 0, SEEK_SET);
+    char *buffer = (char *)malloc(length + 1); // 버퍼 할당
+    if (buffer == NULL)
+    {
+        printf("Unable to allocate memory for JSON buffer.\n");
+        fclose(file);
+        return;
+    }
+    fread(buffer, 1, length, file);
+    buffer[length] = '\0';
+    fclose(file);
+
+    // 3. cJSON 라이브러리를 사용하여 JSON 버퍼 구문 분석
+    cJSON *json_data = cJSON_Parse(buffer);
+    if (json_data == NULL)
+    {
+        printf("Unable to parse JSON data.\n");
+        free(buffer);
+        return;
+    }
+
+    cJSON *json_inventory = cJSON_GetObjectItem(json_data, "stock");
+
+    // 4. JSON 배열을 순회하며 각 항목을 인벤토리 연결 리스트에 로드
+    int inventory_size = cJSON_GetArraySize(json_inventory);
+    for (int i = 0; i < inventory_size; i++)
+    {
+        cJSON *json_item = cJSON_GetArrayItem(json_inventory, i);
+
+        // 4.1 JSON 항목에서 값을 가져오기
+        long long 바코드 = cJSON_GetObjectItem(json_item, "바코드")->valuedouble;
+        char *상품명 = cJSON_GetObjectItem(json_item, "상품명")->valuestring;
+        char *분류 = cJSON_GetObjectItem(json_item, "분류")->valuestring;
+        int 가격 = cJSON_GetObjectItem(json_item, "가격")->valueint;
+        char *제조사 = cJSON_GetObjectItem(json_item, "제조사")->valuestring;
+        int 재고량 = cJSON_GetObjectItem(json_item, "재고량")->valueint;
+        cJSON *json_유통기한 = cJSON_GetObjectItem(json_item, "유통기한");
+        char *유통기한 = json_유통기한->type == cJSON_NULL ? "null" : json_유통기한->valuestring;
+
+        // 4.2 항목을 인벤토리 연결 리스트에 추가
+        add_item(바코드, 상품명, 분류, 가격, 제조사, 재고량, 유통기한);
+    }
+
+    // 5. cJSON 객체와 버퍼 정리
+    cJSON_Delete(json_data);
+    free(buffer);
+}
+
+
+int main()
+{   
+    // 프로그램 시작 시 JSON 파일에서 인벤토리 불러오기
+    const char *file_name = FILE_NAME;
+    load_inventory_from_file(file_name);
+
     int 선택;
     long long 바코드;
     int 재고량;
