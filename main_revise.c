@@ -1,67 +1,70 @@
-#include <stdio.h> // printf, scanf
-#include <stdlib.h> // malloc, free
-#include <string.h> // strcpy
-#include "cJSON.h" // JSON 파싱 라이브러리
+#include <stdio.h> 
+#include <stdlib.h> 
+#include <string.h> 
+#include "cJSON.h" 
 
-#define EXPIR 50 // 유통기한 문자열 길이
-#define S_SIZE 50 // 상품명, 분류, 제조사 문자열 길이
-#define FILE_NAME "productList.json" // JSON 파일 이름
+#define EXPIR 50
+#define S_SIZE 50
+#define FILE_NAME "productList.json"
 
 // 상품 구조체
 typedef struct Item 
 {
-    long long 바코드;
-    char 상품명[S_SIZE];
-    char 분류[S_SIZE];
-    int 가격;
-    char 제조사[S_SIZE];
-    int 재고량;
-    char 유통기한[EXPIR];
-    struct Item* next;
-} Item;
+    long long 바코드; 
+    char 상품명[S_SIZE]; 
+    char 분류[S_SIZE]; 
+    int 가격;          
+    char 제조사[S_SIZE]; 
+    int 재고량;            
+    char 유통기한[EXPIR]; 
+    struct Item* next; 
+} Item; // Item 구조체
 
-Item* head = NULL; // 인벤토리의 첫 번째 상품을 가리키는 포인터
+Item* head = NULL; 
 
 
+// 상품을 생성하는 함수
 Item* create_item(long long 바코드, char* 상품명, char* 분류, int 가격, char* 제조사, int 재고량, char* 유통기한)
 {
-    Item* new_item = (Item*)malloc(sizeof(Item));
-    new_item->바코드 = 바코드;
-    strcpy(new_item->상품명, 상품명);
-    strcpy(new_item->분류, 분류);
-    new_item->가격 = 가격;
-    strcpy(new_item->제조사, 제조사);
+    Item* new_item = (Item*)malloc(sizeof(Item)); 
+    new_item->바코드 = 바코드; 
+    strcpy(new_item->상품명, 상품명); 
+    strcpy(new_item->분류, 분류); 
+    new_item->가격 = 가격; 
+    strcpy(new_item->제조사, 제조사); 
     new_item->재고량 = 재고량;
-    strcpy(new_item->유통기한, 유통기한);
-    new_item->next = NULL;
-    return new_item;
+    strcpy(new_item->유통기한, 유통기한); 
+    new_item->next = NULL; 
+    return new_item; 
 }
 
 
+// 상품을 인벤토리에 추가하는 함수
 void add_item(long long 바코드, char* 상품명, char* 분류, int 가격, char* 제조사, int 재고량, char* 유통기한)
-{
+{  
     Item* new_item = create_item(바코드, 상품명, 분류, 가격, 제조사, 재고량, 유통기한);
-    if (head == NULL)
+    if (head == NULL) 
     {
-        head = new_item;
+        head = new_item; 
     }
     else
     {
-        Item* temp = head;
+        Item* temp = head; 
         while (temp->next != NULL)
         {
-            temp = temp->next;
+            temp = temp->next; 
         }
-        temp->next = new_item;
+        temp->next = new_item; 
     }
 }
 
+// 인벤토리에 있는 상품을 출력하는 함수
 void display_items()
 {
     Item* temp = head;
-    if (temp == NULL)
+    if (temp == NULL) 
     {
-        printf("\t\t인벤토리가 비어 있습니다.\n");
+        printf("\t\t인벤토리가 비어 있습니다.\n"); 
         return;
     }
     printf("[인벤토리에 있는 상품]\n");
@@ -73,166 +76,163 @@ void display_items()
     }
 }
 
+// 인벤토리에 있는 상품을 파일에 저장하는 함수
 Item* search_item(long long 바코드)
 {
-    Item* temp = head;
-    while (temp != NULL)
+    Item* temp = head; 
+    while (temp != NULL) 
     {
-        if (temp->바코드 == 바코드)
+        if (temp->바코드 == 바코드) 
         {
-            return temp;
+            return temp;  
         }
-        temp = temp->next;
+        temp = temp->next; 
     }
-    return NULL;
+    return NULL; 
 }
 
-void delete_item(long long 바코드)
+void delete_item(long long 바코드) 
 {
     Item* temp = head;
-    Item* prev = NULL;
+    Item* prev = NULL; 
 
-    if (temp != NULL && temp->바코드 == 바코드)
+    if (temp != NULL && temp->바코드 == 바코드) 
     {
-        head = temp->next;
-        free(temp);
+        head = temp->next; 
+        free(temp); 
         return;
     }
 
-    while (temp != NULL && temp->바코드 != 바코드)
+    while (temp != NULL && temp->바코드 != 바코드) 
     {
-        prev = temp;
-        temp = temp->next;
+        prev = temp; 
+        temp = temp->next; 
     }
-    if (temp == NULL)
+    if (temp == NULL) 
     {
         printf("상품을 찾을 수 없습니다.\n");
         return;
     }
 
     prev->next = temp->next;
-    free(temp);
+    free(temp); 
 }
 
 // JSON 파일을 읽어서 인벤토리에 추가
 void load_inventory_from_file(const char *file_name)
 {
     // 1. JSON 파일을 읽기 위해 열기
-    FILE *file = fopen(file_name, "rb");
-    if (file == NULL)
+    FILE *file = fopen(file_name, "rb"); 
+    if (file == NULL)   
     {
         printf("Unable to open %s for reading.\n", file_name);
         return;
     }
 
     // 2. 파일 전체를 버퍼에 읽어오기
-
-    //fseek(file, 0, SEEK_END)를 사용하여 파일 포인터를 파일의 끝으로 이동시키고, 
-    //long length = ftell(file)를 사용하여 현재 파일 포인터의 위치를 얻어 파일의 크기를 구합니다. 
-    //마지막으로, fseek(file, 0, SEEK_SET)를 사용하여 파일 포인터를 다시 파일의 시작 위치로 되돌립니다.
     fseek(file, 0, SEEK_END);
     long length = ftell(file);
     fseek(file, 0, SEEK_SET);
 
 
-    char *buffer = (char *)malloc(length + 1); // 버퍼 할당
-    if (buffer == NULL)
+    char *buffer = (char *)malloc(length + 1); 
+    if (buffer == NULL) 
     {
         printf("Unable to allocate memory for JSON buffer.\n");
         fclose(file);
         return;
     }
     
-    fread(buffer, 1, length, file);
-    buffer[length] = '\0';
-    fclose(file);
+    fread(buffer, 1, length, file); // 파일을 버퍼에 읽어옴
+    buffer[length] = '\0'; // 버퍼의 끝에 NULL 문자 추가
+    fclose(file); // 파일 닫기
 
     // 3. cJSON 라이브러리를 사용하여 JSON 버퍼 구문 분석
     cJSON *json_data = cJSON_Parse(buffer);
-    if (json_data == NULL)
+    if (json_data == NULL) 
     {
         printf("Unable to parse JSON data.\n");
         free(buffer);
         return;
     }
 
-    cJSON *json_inventory = cJSON_GetObjectItem(json_data, "stock");
+    cJSON *json_inventory = cJSON_GetObjectItem(json_data, "stock"); 
 
     // 4. JSON 배열을 순회하며 각 항목을 인벤토리 연결 리스트에 로드
-    int inventory_size = cJSON_GetArraySize(json_inventory);
-    for (int i = 0; i < inventory_size; i++)
+    int inventory_size = cJSON_GetArraySize(json_inventory); 
+    for (int i = 0; i < inventory_size; i++) 
     {
-        cJSON *json_item = cJSON_GetArrayItem(json_inventory, i);
+        cJSON *json_item = cJSON_GetArrayItem(json_inventory, i); 
 
         // 4.1 JSON 항목에서 값을 가져오기
-        long long 바코드 = cJSON_GetObjectItem(json_item, "바코드")->valuedouble;
-        char *상품명 = cJSON_GetObjectItem(json_item, "상품명")->valuestring;
-        char *분류 = cJSON_GetObjectItem(json_item, "분류")->valuestring;
-        int 가격 = cJSON_GetObjectItem(json_item, "가격")->valueint;
-        char *제조사 = cJSON_GetObjectItem(json_item, "제조사")->valuestring;
-        int 재고량 = cJSON_GetObjectItem(json_item, "재고량")->valueint;
-        cJSON *json_유통기한 = cJSON_GetObjectItem(json_item, "유통기한");
-        char *유통기한 = json_유통기한->type == cJSON_NULL ? "null" : json_유통기한->valuestring;
+        long long 바코드 = cJSON_GetObjectItem(json_item, "바코드")->valuedouble; 
+        char *상품명 = cJSON_GetObjectItem(json_item, "상품명")->valuestring; 
+        char *분류 = cJSON_GetObjectItem(json_item, "분류")->valuestring;   
+        int 가격 = cJSON_GetObjectItem(json_item, "가격")->valueint; 
+        char *제조사 = cJSON_GetObjectItem(json_item, "제조사")->valuestring; 
+        int 재고량 = cJSON_GetObjectItem(json_item, "재고량")->valueint; 
+        cJSON *json_유통기한 = cJSON_GetObjectItem(json_item, "유통기한"); 
+        char *유통기한 = json_유통기한->type == cJSON_NULL ? "null" : json_유통기한->valuestring; 
 
         // 4.2 항목을 인벤토리 연결 리스트에 추가
-        add_item(바코드, 상품명, 분류, 가격, 제조사, 재고량, 유통기한);
+        add_item(바코드, 상품명, 분류, 가격, 제조사, 재고량, 유통기한);  
     }
 
     // 5. cJSON 객체와 버퍼 정리
-    cJSON_Delete(json_data);
-    free(buffer);
+    cJSON_Delete(json_data); 
+    free(buffer); 
 }
 
 // 인벤토리를 JSON 파일로 저장
-void save_inventory_to_file(const char *file_name)
+void save_inventory_to_file(const char *file_name)   
 {
-    cJSON *json_data = cJSON_CreateObject();
+    cJSON *json_data = cJSON_CreateObject(); 
     cJSON *json_inventory = cJSON_CreateArray();
 
     Item *current = head;
-    while (current != NULL)
+    while (current != NULL) 
     {
-        cJSON *json_item = cJSON_CreateObject();
+        cJSON *json_item = cJSON_CreateObject(); 
+        cJSON_AddNumberToObject(json_item, "바코드", current->바코드); 
+        cJSON_AddStringToObject(json_item, "상품명", current->상품명); 
+        cJSON_AddStringToObject(json_item, "분류", current->분류); 
+        cJSON_AddNumberToObject(json_item, "가격", current->가격); 
+        cJSON_AddStringToObject(json_item, "제조사", current->제조사); 
+        cJSON_AddNumberToObject(json_item, "재고량", current->재고량); 
+        cJSON_AddStringToObject(json_item, "유통기한", current->유통기한); 
 
-        cJSON_AddNumberToObject(json_item, "바코드", current->바코드);
-        cJSON_AddStringToObject(json_item, "상품명", current->상품명);
-        cJSON_AddStringToObject(json_item, "분류", current->분류);
-        cJSON_AddNumberToObject(json_item, "가격", current->가격);
-        cJSON_AddStringToObject(json_item, "제조사", current->제조사);
-        cJSON_AddNumberToObject(json_item, "재고량", current->재고량);
-        cJSON_AddStringToObject(json_item, "유통기한", current->유통기한);
-
-        cJSON_AddItemToArray(json_inventory, json_item);
-        current = current->next;
+        cJSON_AddItemToArray(json_inventory, json_item); 
+        current = current->next; // 다음 항목으로 이동
     }
 
-    cJSON_AddItemToObject(json_data, "stock", json_inventory);
+    cJSON_AddItemToObject(json_data, "stock", json_inventory); 
 
-    char *json_string = cJSON_Print(json_data);
+    char *json_string = cJSON_Print(json_data); 
 
     FILE *file = fopen(file_name, "wb");
-    if (file == NULL)
+    if (file == NULL) 
     {
         printf("Unable to open %s for writing.\n", file_name);
-        cJSON_Delete(json_data);
+        cJSON_Delete(json_data); 
         return;
     }
 
-    fwrite(json_string, strlen(json_string), 1, file);
-    fclose(file);
+    fwrite(json_string, strlen(json_string), 1, file); 
+    fclose(file); // 파일 닫기
 
-    cJSON_Delete(json_data);
-    free(json_string);
+    cJSON_Delete(json_data); 
+    free(json_string);  
 }
 
+// 인벤토리 연결 리스트의 모든 항목을 삭제
 void free_all_items()
 {
-    Item *current = head;
-    Item *next_item;
+    Item *current = head; 
+    Item *next_item; 
 
-    while (current != NULL)
+    while (current != NULL) 
     {
-        next_item = current->next;
+        next_item = current->next; 
         free(current);
         current = next_item;
     }
@@ -241,9 +241,8 @@ void free_all_items()
 
 int main()
 {   
-    // 프로그램 시작 시 JSON 파일에서 인벤토리 불러오기
-    const char *file_name = FILE_NAME;
-    load_inventory_from_file(file_name);
+    const char *file_name = FILE_NAME; 
+    load_inventory_from_file(file_name); 
 
     int 선택;
     long long 바코드;
@@ -326,3 +325,4 @@ int main()
     }
     return 0;
 }
+
