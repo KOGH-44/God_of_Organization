@@ -1,14 +1,14 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <stdbool.h>
-#include "cJSON.h"
+#include <stdio.h> // printf, scanf
+#include <stdlib.h> // malloc, free
+#include <string.h> // strcpy
+#include "cJSON.h" // JSON 파싱 라이브러리
 
-#define EXPIR 50
-#define S_SIZE 50
-#define FILE_NAME "productList.json"
+#define EXPIR 50 // 유통기한 문자열 길이
+#define S_SIZE 50 // 상품명, 분류, 제조사 문자열 길이
+#define FILE_NAME "productList.json" // JSON 파일 이름
 
-typedef struct Item
+// 상품 구조체
+typedef struct Item 
 {
     long long 바코드;
     char 상품명[S_SIZE];
@@ -20,7 +20,8 @@ typedef struct Item
     struct Item* next;
 } Item;
 
-Item* head = NULL;
+Item* head = NULL; // 인벤토리의 첫 번째 상품을 가리키는 포인터
+
 
 Item* create_item(long long 바코드, char* 상품명, char* 분류, int 가격, char* 제조사, int 재고량, char* 유통기한)
 {
@@ -35,6 +36,7 @@ Item* create_item(long long 바코드, char* 상품명, char* 분류, int 가격
     new_item->next = NULL;
     return new_item;
 }
+
 
 void add_item(long long 바코드, char* 상품명, char* 분류, int 가격, char* 제조사, int 재고량, char* 유통기한)
 {
@@ -124,9 +126,15 @@ void load_inventory_from_file(const char *file_name)
     }
 
     // 2. 파일 전체를 버퍼에 읽어오기
+
+    //fseek(file, 0, SEEK_END)를 사용하여 파일 포인터를 파일의 끝으로 이동시키고, 
+    //long length = ftell(file)를 사용하여 현재 파일 포인터의 위치를 얻어 파일의 크기를 구합니다. 
+    //마지막으로, fseek(file, 0, SEEK_SET)를 사용하여 파일 포인터를 다시 파일의 시작 위치로 되돌립니다.
     fseek(file, 0, SEEK_END);
-    long length = ftell(file); // 파일 크기
+    long length = ftell(file);
     fseek(file, 0, SEEK_SET);
+
+
     char *buffer = (char *)malloc(length + 1); // 버퍼 할당
     if (buffer == NULL)
     {
@@ -134,6 +142,7 @@ void load_inventory_from_file(const char *file_name)
         fclose(file);
         return;
     }
+    
     fread(buffer, 1, length, file);
     buffer[length] = '\0';
     fclose(file);
@@ -174,6 +183,61 @@ void load_inventory_from_file(const char *file_name)
     free(buffer);
 }
 
+// 인벤토리를 JSON 파일로 저장
+void save_inventory_to_file(const char *file_name)
+{
+    cJSON *json_data = cJSON_CreateObject();
+    cJSON *json_inventory = cJSON_CreateArray();
+
+    Item *current = head;
+    while (current != NULL)
+    {
+        cJSON *json_item = cJSON_CreateObject();
+
+        cJSON_AddNumberToObject(json_item, "바코드", current->바코드);
+        cJSON_AddStringToObject(json_item, "상품명", current->상품명);
+        cJSON_AddStringToObject(json_item, "분류", current->분류);
+        cJSON_AddNumberToObject(json_item, "가격", current->가격);
+        cJSON_AddStringToObject(json_item, "제조사", current->제조사);
+        cJSON_AddNumberToObject(json_item, "재고량", current->재고량);
+        cJSON_AddStringToObject(json_item, "유통기한", current->유통기한);
+
+        cJSON_AddItemToArray(json_inventory, json_item);
+        current = current->next;
+    }
+
+    cJSON_AddItemToObject(json_data, "stock", json_inventory);
+
+    char *json_string = cJSON_Print(json_data);
+
+    FILE *file = fopen(file_name, "wb");
+    if (file == NULL)
+    {
+        printf("Unable to open %s for writing.\n", file_name);
+        cJSON_Delete(json_data);
+        return;
+    }
+
+    fwrite(json_string, strlen(json_string), 1, file);
+    fclose(file);
+
+    cJSON_Delete(json_data);
+    free(json_string);
+}
+
+void free_all_items()
+{
+    Item *current = head;
+    Item *next_item;
+
+    while (current != NULL)
+    {
+        next_item = current->next;
+        free(current);
+        current = next_item;
+    }
+}
+
 
 int main()
 {   
@@ -193,7 +257,8 @@ int main()
         printf("2. 상품 목록 표시\n");
         printf("3. 상품 검색\n");
         printf("4. 상품 삭제\n");
-        printf("5. 종료\n\n");
+        printf("5. DB에 저장\n\n");
+        printf("6. 종료\n\n");
         printf("원하는 명령을 선택하세요: ");
         scanf("%d", &선택);
         printf("\n");
@@ -243,8 +308,16 @@ int main()
             scanf("%lld", &바코드);
             delete_item(바코드);
             break;
-        case 5: // 종료
+        
+        case 5: // DB 저장
+            printf("인벤토리 저장 중...\n\n");
+            save_inventory_to_file(file_name);
+            printf("인벤토리 저장 완료.\n");
+            break;
+
+        case 6: // 종료
             printf("종료 중...\n\n");
+            free_all_items(); // 메모리 해제
             exit(0);
             break;
         default:
