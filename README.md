@@ -29,7 +29,7 @@
 
 ## Code Review
 
-### haedr 
+### haeder 
 
 ``` c
 #include <stdio.h> // printf, scanf
