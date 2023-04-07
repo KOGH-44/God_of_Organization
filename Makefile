@@ -1,4 +1,4 @@
-app.out : main_revise.o cJSON.o
+app.out : main_revise.o cJSON.o	
 	gcc -o app.out main_revise.c cJSON.c
 
 main.o : main_revise.c
