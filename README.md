@@ -14,6 +14,7 @@
 ### 사용한 json File 구조
 파일명 "productList.json" 직접 만듬
 
+```json
    "stock": [
         {
             "바코드": 8010192928102,
@@ -24,11 +25,13 @@
             "재고량": 5,
             "유통기한": "2023-08-10"
         },
+```
 
 ## Code Review
 
 ### haedr 
 
+``` c
 #include <stdio.h> // printf, scanf
 #include <stdlib.h> // malloc, free
 #include <string.h> // strcpy
@@ -37,10 +40,11 @@
 #define EXPIR 50 // 유통기한 문자열 길이
 #define S_SIZE 50 // 상품명, 분류, 제조사 문자열 길이
 #define FILE_NAME "productList.json" // JSON 파일 이름
-
+```
 
 ### 상품 구조체
 
+```c
 typedef struct Item 
 {
     long long 바코드; // 바코드는 13자리 숫자
@@ -54,10 +58,10 @@ typedef struct Item
 } Item; // Item 구조체
 
 Item* head = NULL; // 인벤토리의 첫 번째 상품을 가리키는 포인터
-
+```
 
 ### 상품을 생성하는 함수
-
+```c
 Item* create_item(long long 바코드, char* 상품명, char* 분류, int 가격, char* 제조사, int 재고량, char* 유통기한)
 {
     Item* new_item = (Item*)malloc(sizeof(Item)); // 상품을 생성
@@ -71,9 +75,10 @@ Item* create_item(long long 바코드, char* 상품명, char* 분류, int 가격
     new_item->next = NULL; // 상품의 다음 상품을 가리키는 포인터를 NULL로 설정
     return new_item; // 생성한 상품을 반환
 }
+```
 
 ### 인벤토리에 있는 상품을 삭제하는 함수
-
+```c
 void delete_item(long long 바코드)  // 상품의 바코드를 입력받음
 {
     Item* temp = head; // 인벤토리의 첫 번째 상품을 가리키는 포인터를 생성
@@ -100,9 +105,9 @@ void delete_item(long long 바코드)  // 상품의 바코드를 입력받음
     prev->next = temp->next; // 이전 상품의 다음 상품을 현재 상품의 다음 상품으로 설정
     free(temp); // 현재 상품을 삭제
 }
-
+```
 ### JSON 파일을 읽어서 인벤토리에 추가
-
+```c
 void load_inventory_from_file(const char *file_name)
 {
     // 1. JSON 파일을 읽기 위해 열기
@@ -170,10 +175,10 @@ void load_inventory_from_file(const char *file_name)
     cJSON_Delete(json_data); // cJSON 객체 삭제
     free(buffer); // 버퍼 삭제
 }
-
+```
 
 ### 인벤토리를 JSON 파일로 저장
-
+```c
 void save_inventory_to_file(const char *file_name)   
 {
     cJSON *json_data = cJSON_CreateObject(); // JSON 데이터를 저장할 cJSON 객체 생성
@@ -214,9 +219,9 @@ void save_inventory_to_file(const char *file_name)
     cJSON_Delete(json_data); // cJSON 객체 삭제
     free(json_string);  
 }
-
+```
 ### 인벤토리 연결 리스트의 모든 항목을 삭제
-
+```c
 void free_all_items()
 {
     Item *current = head; // 연결 리스트의 첫 번째 항목을 가리키는 포인터
@@ -229,10 +234,10 @@ void free_all_items()
         current = next_item;
     }
 }
-
+```
 
 ### 메인부 ------------
-
+```c
 int main()
 {   
     // 프로그램 시작 시 JSON 파일에서 인벤토리 불러오기
@@ -320,4 +325,4 @@ int main()
     }
     return 0;
 }
-
+```
