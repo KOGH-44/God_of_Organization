@@ -326,3 +326,14 @@ int main()
     return 0;
 }
 ```
+![목록추가](https://user-images.githubusercontent.com/76278512/230550353-68463aab-135e-4bec-9af8-a8aa1049dac6.png)
+
+![목록출력](https://user-images.githubusercontent.com/76278512/230550395-dade252e-a3c7-422b-b461-cdecd33452c8.png)
+
+![상품검색](https://user-images.githubusercontent.com/76278512/230550421-a1a8fa1f-9c67-44c7-ad12-49dd24924079.png)
+
+![상품삭제](https://user-images.githubusercontent.com/76278512/230550453-013c3e14-13f4-467f-81eb-9cd3f0b549c0.png)
+
+![DB저장](https://user-images.githubusercontent.com/76278512/230550485-d0288430-dc97-423b-be12-62f0a6326bbc.png)
+
+![DB저장확인](https://user-images.githubusercontent.com/76278512/230550495-a74f47e4-4326-4e84-a479-4b629c36843b.png)
