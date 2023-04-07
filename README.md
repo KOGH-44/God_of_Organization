@@ -7,9 +7,12 @@
 편의점의 재고나 도서관의 도서자료등을 정리할 수 있는 프로그램을 작성해보고자 했습니다.
 
 ### 목표
-- json 파일을 사용한다.
+
+![DB저장확인](https://img1.daumcdn.net/thumb/R1280x0/?scode=mtistory2&fname=https%3A%2F%2Fblog.kakaocdn.net%2Fdn%2FIzifu%2FbtqNRIKzcIp%2Fk6ZT1Jw3apodVIRutwXww1%2Fimg.png)
 - 학습한 linked list 를 사용한다.
+- json 파일을 사용한다.
 - git을 사용한 협업을 한다. 
+
 
 ### 사용한 json File 구조
 파일명 "productList.json" 직접 만듬
