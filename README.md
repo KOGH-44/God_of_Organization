@@ -13,7 +13,8 @@
 
 ### 사용한 json File 구조
 파일명 "productList.json" 직접 만듬
->    "stock": [
+
+   "stock": [
         {
             "바코드": 8010192928102,
             "상품명": "농심 새우깡 90g",
@@ -39,6 +40,7 @@
 
 
 ### 상품 구조체
+
 typedef struct Item 
 {
     long long 바코드; // 바코드는 13자리 숫자
@@ -55,6 +57,7 @@ Item* head = NULL; // 인벤토리의 첫 번째 상품을 가리키는 포인�
 
 
 ### 상품을 생성하는 함수
+
 Item* create_item(long long 바코드, char* 상품명, char* 분류, int 가격, char* 제조사, int 재고량, char* 유통기한)
 {
     Item* new_item = (Item*)malloc(sizeof(Item)); // 상품을 생성
@@ -70,6 +73,7 @@ Item* create_item(long long 바코드, char* 상품명, char* 분류, int 가격
 }
 
 ### 인벤토리에 있는 상품을 삭제하는 함수
+
 void delete_item(long long 바코드)  // 상품의 바코드를 입력받음
 {
     Item* temp = head; // 인벤토리의 첫 번째 상품을 가리키는 포인터를 생성
@@ -98,6 +102,7 @@ void delete_item(long long 바코드)  // 상품의 바코드를 입력받음
 }
 
 ### JSON 파일을 읽어서 인벤토리에 추가
+
 void load_inventory_from_file(const char *file_name)
 {
     // 1. JSON 파일을 읽기 위해 열기
@@ -168,6 +173,7 @@ void load_inventory_from_file(const char *file_name)
 
 
 ### 인벤토리를 JSON 파일로 저장
+
 void save_inventory_to_file(const char *file_name)   
 {
     cJSON *json_data = cJSON_CreateObject(); // JSON 데이터를 저장할 cJSON 객체 생성
@@ -210,6 +216,7 @@ void save_inventory_to_file(const char *file_name)
 }
 
 ### 인벤토리 연결 리스트의 모든 항목을 삭제
+
 void free_all_items()
 {
     Item *current = head; // 연결 리스트의 첫 번째 항목을 가리키는 포인터
